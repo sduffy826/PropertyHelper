@@ -17,15 +17,30 @@ public class PropertyHelper {
     return Thread.currentThread().getContextClassLoader().getResource("").getPath().substring(1);        
   }
   
+  // This returns an input stream for the file passed in, this is the preferred method for opening
+  //   the property files since it'd work in a jar also... note that in ide you don't need the
+  //   resources prefix for the path but the jar needed it... so this should work inside and outside
+  //   the eclipse ide
+  public static InputStream getStream(String filename) {
+    InputStream stream = Thread.currentThread().getClass().getResourceAsStream(filename);
+    if (stream == null) stream = Thread.currentThread().getClass().getResourceAsStream("/resources/"+filename);
+    return stream;
+  }
+  
+  
   // Return properyt object for a given property filename
   public static Properties getPropertyObject(String _propertyFileName) {
     Properties properties = new Properties();
        
     String propertiesPathAndName = getPath() + _propertyFileName;
+     
+    if (debugIt) System.out.println("PropertiesPathAndName: " + propertiesPathAndName);
     
-    if (debugIt) System.out.println("PropertiesPathAndName: " + propertiesPathAndName);        
+    InputStream inputStream = getStream(_propertyFileName);
+    if (debugIt) System.out.println("Input stream from getString: " + inputStream.toString());
+    
     try {
-      properties.load(new FileInputStream(propertiesPathAndName));
+      properties.load(inputStream); // new FileInputStream(propertiesPathAndName));
     } catch (Exception e) {
         e.printStackTrace();
     }    
