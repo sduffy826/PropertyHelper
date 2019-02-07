@@ -11,13 +11,6 @@ import java.util.Properties;
 
 public class PropertyHelper {
   private static boolean debugIt = false;
-  
-  // Return an input stream for the property file name passed in; the file should be located 
-  //   in the same directory as the class files... (getPath() loc), used this instead of getPath
-  //   as net less code.
-  public static InputStream getInputStreamForFile(String _propertyFile) {    
-    return PropertyHelper.class.getClassLoader().getResourceAsStream(_propertyFile);
-  }
 
   // Return the path where the class files exist
   public static String getPath() {
@@ -27,22 +20,15 @@ public class PropertyHelper {
   // Return properyt object for a given property filename
   public static Properties getPropertyObject(String _propertyFileName) {
     Properties properties = new Properties();
-    
-    if (debugIt) System.out.println("PropertyHelper.getPath(): " + getPath());
-    // the old code used the path...i.e.
-    //     String propertiesPathAndName = getPath() + _propertyFile;
-    //      properties.load(new FileInputStream(propertiesPathAndName));
-        
-    InputStream inputStream = getInputStreamForFile(_propertyFileName);
-    
-    if (debugIt) System.out.println("Property file inputStream: " + ( inputStream == null  ? "isNull" : inputStream.toString()));
        
-    try {
-      properties.load(inputStream);
-    } catch (Exception e) {
-      // Nothing to do
-    }
+    String propertiesPathAndName = getPath() + _propertyFileName;
     
+    if (debugIt) System.out.println("PropertiesPathAndName: " + propertiesPathAndName);        
+    try {
+      properties.load(new FileInputStream(propertiesPathAndName));
+    } catch (Exception e) {
+        e.printStackTrace();
+    }    
     return properties;    
   }
   
