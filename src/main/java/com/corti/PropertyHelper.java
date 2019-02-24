@@ -23,8 +23,32 @@ public class PropertyHelper {
   //   the eclipse ide
   public static InputStream getStream(String filename) {
     InputStream stream = Thread.currentThread().getClass().getResourceAsStream(filename);
-    if (stream == null) stream = Thread.currentThread().getClass().getResourceAsStream("/resources/"+filename);
-    return stream;
+    if (stream == null) {
+      // Add resources onto path and check that
+      if (debugIt) System.out.println("in PropertyHelper.getStream, did not find with getClass().getResourceAsStream");
+      
+      stream = Thread.currentThread().getClass().getResourceAsStream("/resources/"+filename);
+      if (stream == null) {
+        // Didn't find with getClass, try getContextClassLoader
+        if (debugIt) System.out.println("in PropertyHelper.getStream, did not find with getClass().getResourceAsStream /resources/");
+        
+        stream = Thread.currentThread().getContextClassLoader().getSystemResourceAsStream(filename);
+        if (stream == null) {
+          // Didn't find, last try, try it with resources onto the path
+          if (debugIt) System.out.println("in PropertyHelper.getStream, did not find with getContextClassLoader().getResourceAsStream");
+          
+          stream = Thread.currentThread().getContextClassLoader().getSystemResourceAsStream("/resources/" + filename);
+          if (stream == null) {
+            if (debugIt) System.out.println("in PropertyHelper.getStream, did not find with getContextClassLoader().getResourceAsStream /resources/");     
+          }
+          else if (debugIt) System.out.println("in PropertyHelper.getStream, found with getContextClassLoader().getResourceAsStream /resources/");         
+        }
+        else if (debugIt) System.out.println("in PropertyHelper.getStream, found with getContextClassLoader().getResourceAsStream");
+      }
+      else if (debugIt) System.out.println("in PropertyHelper.getStream, found with getClass().getResourceAsStream /resources/");      
+    }
+    else if (debugIt) System.out.println("in PropertyHelper.getStream, found with getClass().getResourceAsStream");
+    return stream;    
   }
   
   
